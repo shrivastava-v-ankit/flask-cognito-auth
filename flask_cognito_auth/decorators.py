@@ -158,12 +158,16 @@ def callback_handler(fn):
                 saml_assertions = []
                 for token, val in id_token.items():
                     if token not in skip_tokens:
-                        token_vals = val.replace("[", "")
-                        token_vals = token_vals.replace("]", "")
-                        token_vals = token_vals.split(",")
-                        vals = []
-                        for token_val in token_vals:
-                            vals.append(token_val.strip())
+                        if isinstance(val, list):
+                            vals = [str(item).strip() for item in val]
+                        elif isinstance(val, str):
+                            token_vals = val.replace("[", "")
+                            token_vals = token_vals.replace("]", "")
+                            token_vals = token_vals.split(",")
+                            vals = [token_val.strip() for token_val in token_vals]
+                        else:
+                            vals = [str(val).strip()]
+                
                         saml_assertions.append({token: vals})
 
                 update_session(username=username,
